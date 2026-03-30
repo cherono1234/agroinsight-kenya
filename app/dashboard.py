@@ -347,5 +347,5 @@ with tab4:
     - Ministry of Agriculture, Livestock and Fisheries
 
     ---
-    *BSc. Computer Science | AgroInsight Kenya | 2026*
+    | AgroInsight Kenya | 2026*
     """)

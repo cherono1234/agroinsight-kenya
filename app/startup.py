@@ -1,0 +1,30 @@
+"""
+Runs the full pipeline on first launch if no model exists.
+"""
+import os
+import sys
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC_DIR  = os.path.join(BASE_DIR, 'src')
+sys.path.insert(0, SRC_DIR)
+
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'best_model.pkl')
+
+def ensure_model_exists():
+    if not os.path.exists(MODEL_PATH):
+        print("No model found — training now...")
+        from data_loader  import DataLoader
+        from data_cleaner import DataCleaner
+        from model_trainer import ModelTrainer
+
+        loader    = DataLoader()
+        master_df = loader.load_all()
+        cleaner   = DataCleaner(master_df)
+        clean_df  = cleaner.run_all()
+        trainer   = ModelTrainer(clean_df)
+        trainer.prepare_data()
+        trainer.train_all()
+        trainer.save_best_model()
+        print("Model trained and saved!")
+    else:
+        print("Model already exists — skipping training.")

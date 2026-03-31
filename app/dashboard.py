@@ -13,6 +13,7 @@ import matplotlib.ticker as mticker
 import seaborn as sns
 import sys
 import os
+import streamlit.components.v1 as components
 
 # ── Path setup ────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -100,8 +101,9 @@ st.title("🌱 AgroInsight Kenya")
 st.caption("A Machine Learning System for Crop Yield Prediction | Kenya 🌱")
 # ── Tabs ───────────────────────────────────────────────────────────────
 tab0, tab1, tab2, tab3, tab4 = st.tabs(["🏠 Home","🔮 Prediction","📊 Data Explorer","📈 Trends","ℹ️ About"])
-
 # ══════════════════════════════════════════════════════════════════════
+with tab0:
+    components.html(open(os.path.join(BASE_DIR, "website", "index.html")).read(), height=4000, scrolling=True)
 with tab0:
     st.markdown("""
     <div style="text-align:center; padding:40px 0">

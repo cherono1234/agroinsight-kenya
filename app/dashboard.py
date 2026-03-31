@@ -16,9 +16,10 @@ import os
 
 # ── Path setup so we can import from src/ ─────────────────────────────
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
-
 from startup import ensure_model_exists
 ensure_model_exists()
+
+
 from prediction_engine import PredictionEngine
 
 # ── Page config ───────────────────────────────────────────────────────
@@ -349,5 +350,5 @@ with tab4:
     - Ministry of Agriculture, Livestock and Fisheries
 
     ---
-    | AgroInsight Kenya | 2026*
+     | AgroInsight Kenya | 2026*
     """)

@@ -97,9 +97,7 @@ with st.sidebar:
 #  MAIN PAGE
 # ══════════════════════════════════════════════════════════════════════
 st.title("🌱 AgroInsight Kenya")
-st.caption("A Machine Learning System for Crop Yield Prediction | BSc. Computer Science Project")
-st.divider()
-
+st.caption("A Machine Learning System for Crop Yield Prediction | Kenya 🌱")
 # ── Tabs ───────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4 = st.tabs([
     "🔮 Prediction",

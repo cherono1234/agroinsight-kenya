@@ -99,14 +99,43 @@ with st.sidebar:
 st.title("🌱 AgroInsight Kenya")
 st.caption("A Machine Learning System for Crop Yield Prediction | Kenya 🌱")
 # ── Tabs ───────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
-    "🔮 Prediction",
-    "📊 Data Explorer",
-    "📈 Trends",
-    "ℹ️ About",
-])
+tab0, tab1, tab2, tab3, tab4 = st.tabs(["🏠 Home","🔮 Prediction","📊 Data Explorer","📈 Trends","ℹ️ About"])
 
 # ══════════════════════════════════════════════════════════════════════
+with tab0:
+    st.markdown("""
+    <div style="text-align:center; padding:40px 0">
+        <h1 style="font-size:48px; color:#1A6B3A">🌱 AgroInsight Kenya</h1>
+        <p style="font-size:20px; color:#555; margin:16px 0 32px">
+            Machine Learning Crop Yield Prediction for Kenyan Farmers
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Counties Covered", "10")
+    c2.metric("Crops Supported", "5")
+    c3.metric("Years of Data", "10")
+
+    st.divider()
+    st.subheader("What is AgroInsight Kenya?")
+    st.write("""
+    AgroInsight Kenya is a free, data-driven crop yield prediction system 
+    built specifically for Kenyan smallholder farmers and agricultural 
+    extension officers. Using machine learning trained on real Kenyan 
+    agricultural, weather, and soil data, it predicts how much your crop 
+    will yield before you plant — helping you make smarter decisions.
+    """)
+    st.divider()
+    st.subheader("How to use it")
+    st.write("1. Click the **Prediction** tab above")
+    st.write("2. Select your county, crop, and season from the sidebar")
+    st.write("3. Adjust the weather and soil sliders")
+    st.write("4. Click **Predict Yield** to get your forecast")
+    st.divider()
+    st.info("👈 Click **Prediction** tab to get started!")
+    # ══════════════════════════════════════════════════════════════════════
+
 #  TAB 1 — PREDICTION
 # ══════════════════════════════════════════════════════════════════════
 with tab1:

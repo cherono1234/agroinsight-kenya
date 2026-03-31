@@ -28,7 +28,7 @@ class DataLoader:
         return m
     def _gen_yield(self):
         np.random.seed(42)
-        counties=["Nakuru","Kisumu","Machakos","Meru","Kakamega","Uasin Gishu","Trans Nzoia","Nyandarua","Kirinyaga","Muranga"]
+        counties=["Baringo","Bomet","Bungoma","Busia","Elgeyo Marakwet","Embu","Garissa","Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi","Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu","Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa","Muranga","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua","Nyeri","Samburu","Siaya","Taita Taveta","Tana River","Tharaka Nithi","Trans Nzoia","Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot"]
         crops=["Maize","Beans","Wheat","Sorghum","Potatoes"]
         seasons=["Long Rains","Short Rains"]
         years=list(range(2015,2025))
@@ -43,7 +43,7 @@ class DataLoader:
         return df
     def _gen_weather(self):
         np.random.seed(24)
-        counties=["Nakuru","Kisumu","Machakos","Meru","Kakamega","Uasin Gishu","Trans Nzoia","Nyandarua","Kirinyaga","Muranga"]
+        counties=["Baringo","Bomet","Bungoma","Busia","Elgeyo Marakwet","Embu","Garissa","Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi","Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu","Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa","Muranga","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua","Nyeri","Samburu","Siaya","Taita Taveta","Tana River","Tharaka Nithi","Trans Nzoia","Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot"]
         rows=[]
         for c in counties:
             for y in range(2015,2025):
@@ -54,7 +54,7 @@ class DataLoader:
         return df
     def _gen_soil(self):
         np.random.seed(7)
-        counties=["Nakuru","Kisumu","Machakos","Meru","Kakamega","Uasin Gishu","Trans Nzoia","Nyandarua","Kirinyaga","Muranga"]
+        counties=["Baringo","Bomet","Bungoma","Busia","Elgeyo Marakwet","Embu","Garissa","Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi","Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu","Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa","Muranga","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua","Nyeri","Samburu","Siaya","Taita Taveta","Tana River","Tharaka Nithi","Trans Nzoia","Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot"]
         rows=[{"county":c,"ph_level":round(np.random.uniform(4.5,7.5),2),"soil_type":np.random.choice(["Clay","Loam","Sandy Loam"]),"fertility_index":round(np.random.uniform(0.3,0.95),2)} for c in counties]
         df=pd.DataFrame(rows)
         df.to_csv(os.path.join(self.raw_dir,"soil_data.csv"),index=False)

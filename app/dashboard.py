@@ -67,15 +67,15 @@ CONF_COLORS = {
 #  SIDEBAR
 # ══════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/4/49/Kenya_coat_of_arms.svg", width=80)
     st.title("🌱 AgroInsight Kenya")
     st.caption("Data-Driven Crop Yield Prediction")
     st.divider()
 
+    from weather_api import get_weather, get_counties
     options = PredictionEngine.get_options()
+    options['counties'] = get_counties()
 
     st.subheader("📍 Select Parameters")
-
     county  = st.selectbox("County",  options['counties'])
     crop    = st.selectbox("Crop",    options['crops'])
     season  = st.selectbox("Season",  options['seasons'])
@@ -84,8 +84,18 @@ with st.sidebar:
     st.divider()
     st.subheader("🌦️ Weather & Soil Inputs")
 
-    rainfall    = st.slider("Avg Rainfall (mm)",    100, 1500, 700, step=10)
-    temperature = st.slider("Avg Temperature (°C)",  10,   35,  22, step=1)
+    if st.button("📡 Auto-fetch weather", use_container_width=True):
+        with st.spinner("Fetching live weather..."):
+            wx = get_weather(county)
+            if wx:
+                st.session_state['rainfall']    = wx['avg_rainfall_mm']
+                st.session_state['temperature'] = wx['avg_temp_celsius']
+                st.success(f"✅ Weather loaded for {county}")
+            else:
+                st.warning("Could not fetch weather. Use manual sliders.")
+
+    rainfall    = st.slider("Avg Rainfall (mm)",    100, 1500, int(st.session_state.get('rainfall', 700)),    step=10)
+    temperature = st.slider("Avg Temperature (°C)",  10,   35, int(st.session_state.get('temperature', 22)),  step=1)
     rain_dev    = st.slider("Rainfall Deviation (mm)", -200, 200, 0, step=10)
     ph_level    = st.slider("Soil pH Level",          4.0,  8.0, 6.2, step=0.1)
     fertility   = st.slider("Soil Fertility Index",   0.1,  1.0, 0.7, step=0.05)

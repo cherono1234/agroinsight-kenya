@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroInsight Kenya — Crop Yield Prediction</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-deep: #0a2e1a;
+    --green-mid: #1a6b3a;
+    --green-bright: #2ecc71;
+    --green-light: #a8e6c1;
+    --gold: #c9a84c;
+    --cream: #f5f0e8;
+    --white: #ffffff;
+    --text-dark: #0a1a0f;
+    --text-mid: #3d5a47;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(10, 46, 26, 0.92);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--green-light);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    color: rgba(255,255,255,0.75); text-decoration: none;
+    font-size: 14px; font-weight: 400; letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green-light); }
+  .nav-cta {
+    background: var(--green-bright); color: var(--green-deep) !important;
+    padding: 10px 22px; border-radius: 6px; font-weight: 500 !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--gold) !important; color: var(--green-deep) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: var(--green-deep);
+    display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    padding: 120px 48px 80px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(ellipse at 70% 50%, rgba(46,204,113,0.08) 0%, transparent 60%),
+                      radial-gradient(ellipse at 20% 80%, rgba(201,168,76,0.06) 0%, transparent 50%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; opacity: 0.04;
+    background-image: linear-gradient(rgba(168,230,193,0.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(168,230,193,0.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    max-width: 680px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.3);
+    color: var(--green-bright); padding: 6px 16px; border-radius: 100px;
+    font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .hero-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green-bright);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(44px, 6vw, 80px);
+    font-weight: 900; line-height: 1.05;
+    color: var(--white); margin-bottom: 24px;
+  }
+  .hero h1 em { color: var(--green-bright); font-style: normal; }
+  .hero p {
+    font-size: 18px; line-height: 1.7;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px; margin-bottom: 48px;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--green-bright); color: var(--green-deep);
+    padding: 16px 32px; border-radius: 8px;
+    font-size: 15px; font-weight: 500; text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); background: #27ae60; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: transparent; color: rgba(255,255,255,0.8);
+    padding: 16px 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+    font-size: 15px; font-weight: 400; text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--green-bright); color: var(--green-bright); }
+  .hero-visual {
+    position: absolute; right: 48px; top: 50%; transform: translateY(-50%);
+    width: min(500px, 40vw); opacity: 0.9;
+  }
+  .hero-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(168,230,193,0.15);
+    border-radius: 16px; padding: 28px;
+    backdrop-filter: blur(10px);
+  }
+  .hero-card-header {
+    font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--green-light);
+    margin-bottom: 20px; opacity: 0.7;
+  }
+  .hero-stat { margin-bottom: 16px; }
+  .hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+  .hero-stat-bar-wrap {
+    background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; overflow: hidden;
+  }
+  .hero-stat-bar {
+    height: 100%; border-radius: 4px; background: var(--green-bright);
+    animation: growBar 1.5s ease forwards;
+  }
+  @keyframes growBar { from { width: 0; } }
+  .hero-pred {
+    margin-top: 24px; padding: 16px; background: rgba(46,204,113,0.1);
+    border-radius: 10px; border: 1px solid rgba(46,204,113,0.2);
+  }
+  .hero-pred-label { font-size: 11px; color: var(--green-bright); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .hero-pred-value { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--white); font-weight: 700; }
+  .hero-pred-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .hero-pred-badge {
+    display: inline-block; background: rgba(46,204,113,0.2);
+    color: var(--green-bright); padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 500; margin-top: 8px;
+  }
+
+  /* STATS STRIP */
+  .stats-strip {
+    background: var(--gold);
+    padding: 24px 48px;
+    display: flex; justify-content: center; gap: 80px; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 900; color: var(--green-deep);
+  }
+  .stat-label { font-size: 12px; color: rgba(10,46,26,0.6); font-weight: 400; margin-top: 2px; }
+
+  /* SECTIONS */
+  section { padding: 100px 48px; }
+  .section-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--green-mid); margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px); font-weight: 700;
+    color: var(--text-dark); line-height: 1.15; margin-bottom: 20px;
+  }
+  .section-title em { color: var(--green-mid); font-style: normal; }
+  .section-body {
+    font-size: 17px; line-height: 1.75; color: var(--text-mid); max-width: 540px;
+  }
+
+  /* PROBLEM */
+  .problem { background: var(--white); }
+  .problem-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .problem-facts { display: flex; flex-direction: column; gap: 20px; }
+  .fact-card {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 20px; border-radius: 10px;
+    border-left: 3px solid var(--green-mid);
+    background: var(--cream);
+    transition: transform 0.2s;
+  }
+  .fact-card:hover { transform: translateX(4px); }
+  .fact-icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--green-mid); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .fact-title { font-size: 15px; font-weight: 500; color: var(--text-dark); margin-bottom: 4px; }
+  .fact-desc { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+  /* HOW IT WORKS */
+  .how { background: var(--green-deep); }
+  .how-inner { max-width: 1200px; margin: 0 auto; }
+  .how .section-title { color: var(--white); }
+  .how .section-label { color: var(--green-light); }
+  .how .section-body { color: rgba(255,255,255,0.55); }
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 2px; margin-top: 64px;
+  }
+  .step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(168,230,193,0.1);
+    padding: 36px 28px;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+  }
+  .step:first-child { border-radius: 12px 0 0 12px; }
+  .step:last-child { border-radius: 0 12px 12px 0; }
+  .step:hover { background: rgba(46,204,113,0.08); }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px; font-weight: 900;
+    color: rgba(46,204,113,0.1); line-height: 1;
+    margin-bottom: 16px;
+  }
+  .step-title { font-size: 16px; font-weight: 500; color: var(--white); margin-bottom: 10px; }
+  .step-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.65; }
+  .step-tag {
+    display: inline-block; margin-top: 16px;
+    background: rgba(46,204,113,0.12); color: var(--green-bright);
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+  }
+
+  /* FEATURES */
+  .features { background: var(--cream); }
+  .features-inner { max-width: 1200px; margin: 0 auto; }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 64px;
+  }
+  .feature-card {
+    background: var(--white); border-radius: 12px; padding: 32px;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 10px;
+    background: var(--green-deep); display: flex; align-items: center;
+    justify-content: center; font-size: 22px; margin-bottom: 20px;
+  }
+  .feature-title { font-size: 17px; font-weight: 500; color: var(--text-dark); margin-bottom: 10px; }
+  .feature-desc { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
+
+  /* CROPS */
+  .crops { background: var(--white); }
+  .crops-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+  .crops-grid {
+    display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 48px;
+  }
+  .crop-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--cream); border: 1px solid rgba(26,107,58,0.15);
+    padding: 12px 24px; border-radius: 100px;
+    font-size: 15px; color: var(--text-dark); font-weight: 400;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .crop-pill:hover { background: var(--green-deep); color: var(--white); }
+  .crop-emoji { font-size: 20px; }
+
+  /* COUNTIES */
+  .counties { background: var(--green-deep); padding: 80px 48px; }
+  .counties-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+  .counties .section-title { color: var(--white); }
+  .counties .section-label { color: var(--green-light); }
+  .counties-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center; margin-top: 48px;
+  }
+  .county-tag {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(168,230,193,0.15);
+    color: rgba(255,255,255,0.7); padding: 8px 18px; border-radius: 6px;
+    font-size: 13px; transition: background 0.2s;
+  }
+  .county-tag:hover { background: rgba(46,204,113,0.15); color: var(--green-bright); }
+
+  /* CTA */
+  .cta {
+    background: var(--gold);
+    padding: 100px 48px; text-align: center;
+  }
+  .cta-inner { max-width: 700px; margin: 0 auto; }
+  .cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px); font-weight: 900;
+    color: var(--green-deep); margin-bottom: 20px; line-height: 1.15;
+  }
+  .cta p { font-size: 17px; color: rgba(10,46,26,0.65); margin-bottom: 40px; line-height: 1.7; }
+  .btn-dark {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--green-deep); color: var(--white);
+    padding: 18px 40px; border-radius: 8px;
+    font-size: 16px; font-weight: 500; text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .btn-dark:hover { transform: translateY(-2px); background: var(--green-mid); }
+
+  /* FOOTER */
+  footer {
+    background: var(--text-dark); padding: 48px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+    color: var(--green-light); text-decoration: none;
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-links { display: flex; gap: 28px; list-style: none; }
+  .footer-links a { color: rgba(255,255,255,0.4); font-size: 13px; text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--green-light); }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    .hero-visual { display: none; }
+    section { padding: 70px 24px; }
+    .problem-inner { grid-template-columns: 1fr; gap: 48px; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .step:first-child, .step:last-child { border-radius: 0; }
+    .features-grid { grid-template-columns: 1fr; }
+    .stats-strip { gap: 40px; padding: 24px; }
+    footer { flex-direction: column; text-align: center; padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Agro<span>Insight</span> Kenya</a>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#crops">Crops</a></li>
+    <li><a href="https://agroinsight-kenya.streamlit.app" target="_blank" class="nav-cta">Open Dashboard →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content fade-up">
+    <div class="hero-badge">Live · Powered by Machine Learning</div>
+    <h1>Predict Kenya's<br><em>Crop Yields</em><br>Before You Plant</h1>
+    <p>AgroInsight Kenya uses machine learning trained on real Kenyan agricultural data to help farmers and extension officers make smarter planting decisions.</p>
+    <div class="hero-actions">
+      <a href="https://agroinsight-kenya.streamlit.app" target="_blank" class="btn-primary">
+        🌱 Open Dashboard
+      </a>
+      <a href="#how" class="btn-secondary">See how it works →</a>
+    </div>
+  </div>
+  <div class="hero-visual fade-up">
+    <div class="hero-card">
+      <div class="hero-card-header">Live Prediction Sample</div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Rainfall suitability</div>
+        <div class="hero-stat-bar-wrap"><div class="hero-stat-bar" style="width:82%; animation-delay:0.2s"></div></div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Soil fertility index</div>
+        <div class="hero-stat-bar-wrap"><div class="hero-stat-bar" style="width:74%; animation-delay:0.4s; background:#c9a84c"></div></div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Model confidence</div>
+        <div class="hero-stat-bar-wrap"><div class="hero-stat-bar" style="width:95%; animation-delay:0.6s"></div></div>
+      </div>
+      <div class="hero-pred">
+        <div class="hero-pred-label">Predicted Yield · Nakuru · Maize</div>
+        <div class="hero-pred-value">3,247 kg/ha</div>
+        <div class="hero-pred-sub">Long Rains Season · 2025</div>
+        <div class="hero-pred-badge">✓ Good · High Confidence</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-number">10</div>
+    <div class="stat-label">Kenyan Counties</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">5</div>
+    <div class="stat-label">Staple Crops</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">3</div>
+    <div class="stat-label">ML Models Compared</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">98%+</div>
+    <div class="stat-label">Prediction Accuracy</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">10yr</div>
+    <div class="stat-label">Historical Data</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="problem-inner">
+    <div class="fade-up">
+      <div class="section-label">The Challenge</div>
+      <h2 class="section-title">Kenya's farmers plant<br><em>without data</em></h2>
+      <p class="section-body">Over 75% of Kenya's food is produced by smallholder farmers making planting decisions based on tradition — not evidence. The result is preventable losses worth billions of shillings every year.</p>
+    </div>
+    <div class="problem-facts fade-up">
+      <div class="fact-card">
+        <div class="fact-icon">🌧️</div>
+        <div>
+          <div class="fact-title">Unpredictable rainfall</div>
+          <div class="fact-desc">Climate change has made seasonal rainfall increasingly erratic, causing yield failures that data-driven planning could prevent.</div>
+        </div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">📊</div>
+        <div>
+          <div class="fact-title">No prediction tools</div>
+          <div class="fact-desc">Existing advisory platforms give generic advice. None provide personalised, county-level yield forecasts before the season begins.</div>
+        </div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">🌱</div>
+        <div>
+          <div class="fact-title">Misallocated inputs</div>
+          <div class="fact-desc">Without forecasts, farmers over- or under-apply fertiliser and seeds — wasting money and reducing yields simultaneously.</div>
+        </div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">🏛️</div>
+        <div>
+          <div class="fact-title">Reactive government response</div>
+          <div class="fact-desc">County governments react to food crises after they happen. Yield predictions enable proactive resource deployment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="fade-up">
+      <div class="section-label">The Solution</div>
+      <h2 class="section-title" style="color:white">How <em style="color:var(--green-bright)">AgroInsight</em> works</h2>
+      <p class="section-body">Four steps from raw data to actionable yield predictions.</p>
+    </div>
+    <div class="steps fade-up">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Data Collection</div>
+        <div class="step-desc">Historical yield, weather, and soil data collected from KNBS, Kenya Met, and FAO covering 10 years across Kenyan counties.</div>
+        <div class="step-tag">KNBS · FAO · NASA</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Data Processing</div>
+        <div class="step-desc">Raw data is cleaned, standardised, and enriched with engineered features like rainfall deviation and soil fertility indices.</div>
+        <div class="step-tag">Pandas · NumPy</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">ML Training</div>
+        <div class="step-desc">Three models trained and compared — Linear Regression, Random Forest, and XGBoost. The best model is selected automatically.</div>
+        <div class="step-tag">XGBoost · Scikit-learn</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Prediction Dashboard</div>
+        <div class="step-desc">Select your county, crop, and season. Get an instant yield forecast with a confidence rating and farming recommendations.</div>
+        <div class="step-tag">Streamlit · Live</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <div class="fade-up" style="text-align:center; max-width:600px; margin:0 auto 0">
+      <div class="section-label">What You Get</div>
+      <h2 class="section-title">Everything a farmer<br><em>needs to decide</em></h2>
+    </div>
+    <div class="features-grid fade-up">
+      <div class="feature-card">
+        <div class="feature-icon">🔮</div>
+        <div class="feature-title">Yield Prediction</div>
+        <div class="feature-desc">Enter your county, crop, season, and weather parameters. Get a predicted yield in kg/ha with a performance rating — Excellent, Good, Fair, or Poor.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💡</div>
+        <div class="feature-title">Smart Recommendations</div>
+        <div class="feature-desc">Every prediction comes with personalised farming advice — irrigation guidance, soil pH correction tips, and fertiliser recommendations.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">Historical Trends</div>
+        <div class="feature-desc">Visualise how yields have changed over 10 years across counties and crops. Identify which regions perform best for each crop type.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <div class="feature-title">Data Explorer</div>
+        <div class="feature-desc">Browse and filter the full training dataset. View distribution charts, compare counties, and download data for your own analysis.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Instant Results</div>
+        <div class="feature-desc">No waiting. Adjust sliders for rainfall, temperature, soil pH, and area planted — predictions update in real time as you explore scenarios.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🆓</div>
+        <div class="feature-title">Completely Free</div>
+        <div class="feature-desc">AgroInsight Kenya is an open academic project. The dashboard, code, and datasets are all freely available to farmers, researchers, and NGOs.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CROPS -->
+<section class="crops" id="crops">
+  <div class="crops-inner fade-up">
+    <div class="section-label">Supported Crops</div>
+    <h2 class="section-title">Kenya's key <em>staple crops</em></h2>
+    <p class="section-body" style="margin:0 auto 0; text-align:center">AgroInsight Kenya currently supports yield predictions for five of Kenya's most important food crops.</p>
+    <div class="crops-grid">
+      <div class="crop-pill"><span class="crop-emoji">🌽</span> Maize</div>
+      <div class="crop-pill"><span class="crop-emoji">🫘</span> Beans</div>
+      <div class="crop-pill"><span class="crop-emoji">🌾</span> Wheat</div>
+      <div class="crop-pill"><span class="crop-emoji">🌿</span> Sorghum</div>
+      <div class="crop-pill"><span class="crop-emoji">🥔</span> Potatoes</div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTIES -->
+<section class="counties">
+  <div class="counties-inner fade-up">
+    <div class="section-label">Coverage</div>
+    <h2 class="section-title">10 Kenyan Counties</h2>
+    <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-top:12px">Representing Kenya's major agricultural zones — highland, rift valley, western, and central regions.</p>
+    <div class="counties-grid">
+      <div class="county-tag">Nakuru</div>
+      <div class="county-tag">Kisumu</div>
+      <div class="county-tag">Machakos</div>
+      <div class="county-tag">Meru</div>
+      <div class="county-tag">Kakamega</div>
+      <div class="county-tag">Uasin Gishu</div>
+      <div class="county-tag">Trans Nzoia</div>
+      <div class="county-tag">Nyandarua</div>
+      <div class="county-tag">Kirinyaga</div>
+      <div class="county-tag">Murang'a</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-inner fade-up">
+    <h2>Ready to predict your harvest?</h2>
+    <p>Open the free dashboard now. No account needed. Select your county, crop, and season — and get your yield prediction in seconds.</p>
+    <a href="https://agroinsight-kenya.streamlit.app" target="_blank" class="btn-dark">
+      🌱 Open AgroInsight Kenya →
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">Agro<span>Insight</span> Kenya</a>
+  <ul class="footer-links">
+    <li><a href="https://github.com/cherono1234/agroinsight-kenya" target="_blank">GitHub</a></li>
+    <li><a href="https://agroinsight-kenya.streamlit.app" target="_blank">Dashboard</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 AgroInsight Kenya · Open Source · Built for Kenya 🇰🇪</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  document.querySelector('.fade-up').classList.add('visible');
+</script>
+</body>
+</html>

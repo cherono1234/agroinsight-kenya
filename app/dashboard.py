@@ -14,8 +14,10 @@ import seaborn as sns
 import sys
 import os
 
-# ── Path setup so we can import from src/ ─────────────────────────────
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+# ── Path setup ────────────────────────────────────────────────────────
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC_DIR  = os.path.join(BASE_DIR, 'src')
+sys.path.insert(0, SRC_DIR)
 from startup import ensure_model_exists
 ensure_model_exists()
 

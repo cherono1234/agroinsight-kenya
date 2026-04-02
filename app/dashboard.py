@@ -33,7 +33,7 @@ def load_clean_data():
     return None
 df = load_clean_data()
 
-RATING_COLORS = {"Excellent":"#1A6B3A","Good":"#4CAF50","Fair":"#FF9800","Poor":"#F44336"}
+RATING_COLORS = {"Excellent":"#0B3E85","Good":"#4CAF50","Fair":"#FF9800","Poor":"#F44336"}
 
 # ── SIDEBAR ──────────────────────────────────────────────────────────
 with st.sidebar:
@@ -83,7 +83,98 @@ tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 # ── HOME ─────────────────────────────────────────────────────────────
 with tab0:
-    components.html(open(os.path.join(BASE_DIR, "website", "index.html")).read(), height=4000, scrolling=True)
+    col_l, col_r = st.columns([1,1], gap="large")
+    with col_l:
+        st.markdown("""
+        <div style="padding:40px 20px">
+            <div style="background:#2ecc71;color:#0a2e1a;padding:6px 16px;border-radius:100px;
+                        display:inline-block;font-size:12px;font-weight:600;letter-spacing:1px;
+                        margin-bottom:24px">LIVE · POWERED BY MACHINE LEARNING</div>
+            <h1 style="font-size:48px;font-weight:900;color:#0a2e1a;line-height:1.1;margin-bottom:20px">
+                Predict Kenya's<br><span style="color:#1A6B3A">Crop Yields</span><br>Before You Plant
+            </h1>
+            <p style="font-size:17px;color:#3d5a47;line-height:1.7;margin-bottom:32px">
+                AgroInsight Kenya uses machine learning trained on real Kenyan 
+                agricultural data to help farmers make smarter planting decisions.
+            </p>
+            <div style="display:flex;gap:16px;flex-wrap:wrap">
+                <div style="background:#1A6B3A;color:white;padding:14px 28px;border-radius:8px;
+                            font-size:15px;font-weight:500">Click Prediction tab to get started →</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_r:
+        st.markdown("""
+        <div style="background:#0a2e1a;border-radius:16px;padding:32px;margin:20px 0">
+            <div style="font-size:11px;letter-spacing:1.5px;color:#a8e6c1;margin-bottom:20px;opacity:0.7">
+                LIVE PREDICTION SAMPLE
+            </div>
+            <div style="margin-bottom:16px">
+                <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:6px">Rainfall suitability</div>
+                <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
+                    <div style="width:82%;height:100%;background:#2ecc71;border-radius:4px"></div></div>
+            </div>
+            <div style="margin-bottom:16px">
+                <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:6px">Soil fertility index</div>
+                <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
+                    <div style="width:74%;height:100%;background:#c9a84c;border-radius:4px"></div></div>
+            </div>
+            <div style="margin-bottom:16px">
+                <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:6px">Model confidence</div>
+                <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
+                    <div style="width:95%;height:100%;background:#2ecc71;border-radius:4px"></div></div>
+            </div>
+            <div style="background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.2);
+                        border-radius:10px;padding:16px;margin-top:24px">
+                <div style="font-size:11px;color:#2ecc71;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+                    Predicted Yield · Nakuru · Maize</div>
+                <div style="font-size:36px;color:white;font-weight:700">3,247 kg/ha</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px">Long Rains · 2025</div>
+                <div style="display:inline-block;background:rgba(46,204,113,0.2);color:#2ecc71;
+                            padding:3px 10px;border-radius:20px;font-size:11px;margin-top:8px">
+                    Good · High Confidence</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    st.divider()
+    st.markdown("<h2 style='text-align:center;color:#0a2e1a;margin-bottom:32px'>What AgroInsight Kenya offers</h2>", unsafe_allow_html=True)
+    c1,c2,c3,c4 = st.columns(4)
+    c1.metric("Counties Covered", "47", "All of Kenya")
+    c2.metric("Crops Supported", "5", "Key staples")
+    c3.metric("Years of Data", "10", "2015-2025")
+    c4.metric("Model Accuracy", "98%+", "R2 score")
+    st.divider()
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""
+        <div style="background:#E8F5E9;border-radius:12px;padding:24px;border-left:4px solid #1A6B3A">
+            <div style="font-size:28px;margin-bottom:12px">🔮</div>
+            <div style="font-size:17px;font-weight:600;color:#0a2e1a;margin-bottom:8px">Yield Prediction</div>
+            <div style="font-size:14px;color:#3d5a47;line-height:1.6">
+                Get county-level crop yield forecasts before you plant — 
+                with confidence ratings and performance scores.
+            </div>
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+        <div style="background:#E8F5E9;border-radius:12px;padding:24px;border-left:4px solid #1A6B3A">
+            <div style="font-size:28px;margin-bottom:12px">🌱</div>
+            <div style="font-size:17px;font-weight:600;color:#0a2e1a;margin-bottom:8px">Farm Advisory</div>
+            <div style="font-size:14px;color:#3d5a47;line-height:1.6">
+                Crop varieties, fertiliser programmes, and herbicide 
+                recommendations tailored to your county and crop.
+            </div>
+        </div>""", unsafe_allow_html=True)
+    with col3:
+        st.markdown("""
+        <div style="background:#E8F5E9;border-radius:12px;padding:24px;border-left:4px solid #1A6B3A">
+            <div style="font-size:28px;margin-bottom:12px">📈</div>
+            <div style="font-size:17px;font-weight:600;color:#0a2e1a;margin-bottom:8px">Historical Trends</div>
+            <div style="font-size:14px;color:#3d5a47;line-height:1.6">
+                Explore 10 years of yield data across all 47 Kenyan counties 
+                with interactive charts and comparisons.
+            </div>
+        </div>""", unsafe_allow_html=True)
 
 # ── PREDICTION ───────────────────────────────────────────────────────
 with tab1:
@@ -145,9 +236,9 @@ with tab2:
     advisory = get_advisory(crop, county)
     if advisory:
         st.markdown(f"""
-        <div style="background:#E8F5E9;border-left:4px solid #1A6B3A;padding:16px;border-radius:8px;margin-bottom:16px">
-            <b style="color:#1A6B3A">Recommended Varieties for {county}</b><br>
-            <span style="font-size:16px">{advisory["varieties"]}</span>
+        <div style="background:#0a2e1a;border-left:4px solid #2ecc71;padding:20px;border-radius:8px;margin-bottom:16px">
+            <b style="color:#2ecc71;font-size:14px;letter-spacing:1px">RECOMMENDED VARIETIES FOR {county}</b><br>
+            <span style="font-size:20px;font-weight:700;color:#ffffff">{advisory["varieties"]}</span>
         </div>""", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)

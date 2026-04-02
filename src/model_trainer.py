@@ -40,7 +40,7 @@ class ModelTrainer:
         return self
     def print_results(self):
         for n,r in self.results.items():
-            print(f"{n}: R2={r[chr(39)]r2{chr(39)]} RMSE={r[chr(39)]rmse{chr(39)]}")
+            print(f"{n}: R2={r['r2']} RMSE={r['rmse']}")
     def save_best_model(self):
         out = os.path.join(MODELS_DIR, "best_model.pkl")
         with open(out,"wb") as f:

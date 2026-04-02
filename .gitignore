@@ -2,6 +2,7 @@ venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-*.pkl
-.DS_Store
+models/best_model.pkl
 data/raw/
+data/clean/
+.DS_Store

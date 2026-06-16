@@ -311,14 +311,16 @@ with tab3:
         if len(filtered) > 0:
             st.divider()
             st.subheader("Yield Distribution by Crop")
-            fig, ax = plt.subplots(figsize=(10, 4))
             ca = sorted(filtered["crop"].unique())
-            bp = ax.boxplot([filtered[filtered["crop"]==c]["yield_kg_per_ha"].values for c in ca],
-                           labels=ca, patch_artist=True)
-            for patch, color in zip(bp["boxes"], ["#1A6B3A","#4CAF50","#81C784","#A5D6A7","#C8E6C9"]):
-                patch.set_facecolor(color); patch.set_alpha(0.7)
-            ax.set_ylabel("Yield (kg/ha)"); ax.set_facecolor("#FAFAFA")
-            fig.patch.set_facecolor("white"); st.pyplot(fig); plt.close()
+            data_to_plot = [filtered[filtered["crop"]==c]["yield_kg_per_ha"].dropna().values for c in ca]
+            data_to_plot = [(d if len(d) > 0 else [0]) for d in data_to_plot]
+            if any(len(d) > 0 for d in data_to_plot):
+                fig, ax = plt.subplots(figsize=(10, 4))
+                bp = ax.boxplot(data_to_plot, labels=ca, patch_artist=True)
+                for patch, color in zip(bp["boxes"], ["#1A6B3A","#4CAF50","#81C784","#A5D6A7","#C8E6C9"]):
+                    patch.set_facecolor(color); patch.set_alpha(0.7)
+                ax.set_ylabel("Yield (kg/ha)"); ax.set_facecolor("#FAFAFA")
+                fig.patch.set_facecolor("white"); st.pyplot(fig); plt.close()
 
 # ── TRENDS ────────────────────────────────────────────────────────────
 with tab4:

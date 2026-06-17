@@ -308,19 +308,31 @@ with tab3:
             filtered[["county","crop","season","year","yield_kg_per_ha","avg_rainfall_mm","avg_temp_celsius","ph_level","fertility_index"]]
             .sort_values("yield_kg_per_ha", ascending=False).reset_index(drop=True),
             use_container_width=True, height=400)
-        if len(filtered) > 0:
+        if len(filtered) > 0 and filtered["yield_kg_per_ha"].notna().sum() > 0:
             st.divider()
             st.subheader("Yield Distribution by Crop")
-            ca = sorted(filtered["crop"].unique())
-            data_to_plot = [filtered[filtered["crop"]==c]["yield_kg_per_ha"].dropna().values for c in ca]
-            data_to_plot = [(d if len(d) > 0 else [0]) for d in data_to_plot]
-            if any(len(d) > 0 for d in data_to_plot):
-                fig, ax = plt.subplots(figsize=(10, 4))
-                bp = ax.boxplot(data_to_plot, labels=ca, patch_artist=True)
-                for patch, color in zip(bp["boxes"], ["#1A6B3A","#4CAF50","#81C784","#A5D6A7","#C8E6C9"]):
-                    patch.set_facecolor(color); patch.set_alpha(0.7)
-                ax.set_ylabel("Yield (kg/ha)"); ax.set_facecolor("#FAFAFA")
-                fig.patch.set_facecolor("white"); st.pyplot(fig); plt.close()
+            try:
+                ca = sorted(filtered["crop"].dropna().unique().tolist())
+                valid_crops = []
+                data_to_plot = []
+                for c in ca:
+                    vals = filtered.loc[filtered["crop"]==c, "yield_kg_per_ha"].dropna()
+                    vals = vals[np.isfinite(vals)]
+                    if len(vals) > 0:
+                        valid_crops.append(c)
+                        data_to_plot.append(vals.values)
+                if len(data_to_plot) > 0:
+                    fig, ax = plt.subplots(figsize=(10, 4))
+                    bp = ax.boxplot(data_to_plot, tick_labels=valid_crops, patch_artist=True)
+                    palette = ["#1A6B3A","#4CAF50","#81C784","#A5D6A7","#C8E6C9"]
+                    for patch, color in zip(bp["boxes"], palette * 3):
+                        patch.set_facecolor(color); patch.set_alpha(0.7)
+                    ax.set_ylabel("Yield (kg/ha)"); ax.set_facecolor("#FAFAFA")
+                    fig.patch.set_facecolor("white"); st.pyplot(fig); plt.close()
+                else:
+                    st.info("No numeric yield data available for the current filter selection.")
+            except Exception as e:
+                st.warning(f"Could not render distribution chart: {e}")
 
 # ── TRENDS ────────────────────────────────────────────────────────────
 with tab4:

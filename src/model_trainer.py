@@ -46,3 +46,26 @@ class ModelTrainer:
         with open(out,"wb") as f:
             pickle.dump({"model":self.best_model["model"],"scaler":self.best_model["scaler"],"model_name":self.best_name,"features":self.feature_cols,"r2":self.best_model["r2"],"rmse":self.best_model["rmse"],"mae":self.best_model["mae"]}, f)
         print(f"Model saved: {self.best_name}")
+if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from data_loader import DataLoader
+    from data_cleaner import DataCleaner
+
+    print("Loading raw data...")
+    loader = DataLoader()
+    master_df = loader.load_all()
+    print(f"Loaded {len(master_df)} raw records")
+
+    print("Cleaning data...")
+    cleaner = DataCleaner(master_df)
+    clean_df = cleaner.run_all()
+    print(f"Cleaned data: {len(clean_df)} records, saved to data/clean/master_clean.csv")
+
+    print("Training models...")
+    trainer = ModelTrainer(clean_df)
+    trainer.prepare_data()
+    trainer.train_all()
+    trainer.print_results()
+    trainer.save_best_model()
+    print("Done!")

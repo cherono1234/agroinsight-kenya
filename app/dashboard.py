@@ -29,8 +29,26 @@ engine = load_engine()
 def load_clean_data():
     path = os.path.join(BASE_DIR, "data", "clean", "master_clean.csv")
     if os.path.exists(path):
-        return pd.read_csv(path)
-    return None
+        try:
+            return pd.read_csv(path)
+        except Exception as e:
+            print(f"Corrupted clean CSV, regenerating: {e}")
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+    # Regenerate from scratch
+    try:
+        from data_loader import DataLoader
+        from data_cleaner import DataCleaner
+        loader = DataLoader()
+        master_df = loader.load_all()
+        cleaner = DataCleaner(master_df)
+        clean_df = cleaner.run_all()
+        return clean_df
+    except Exception as e:
+        print(f"Could not regenerate clean data: {e}")
+        return None
 df = load_clean_data()
 
 RATING_COLORS = {"Excellent":"#0B3E85","Good":"#4CAF50","Fair":"#FF9800","Poor":"#F44336"}

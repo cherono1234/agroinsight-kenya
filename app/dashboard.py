@@ -17,6 +17,7 @@ ensure_model_exists()
 from prediction_engine import PredictionEngine
 from weather_api import get_weather, get_counties
 from crop_advisory import get_advisory
+from clustering import CountyClusterer
 
 st.set_page_config(page_title="AgroInsight Kenya", page_icon="plant", layout="wide")
 
@@ -94,9 +95,9 @@ st.title("AgroInsight Kenya")
 st.caption("A Machine Learning System for Crop Yield Prediction | Kenya")
 st.divider()
 
-tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab0, tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "Home", "Prediction", "Farm Advisory",
-    "Data Explorer", "Trends", "About"
+    "Data Explorer", "Trends", "County Clusters", "About"
 ])
 
 # ── HOME ─────────────────────────────────────────────────────────────

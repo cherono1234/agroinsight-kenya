@@ -405,7 +405,7 @@ with tab5:
     make_btn(os.path.join(DOCS, "AgroInsight_Kenya_Both_LaTeX.zip"), "Download LaTeX ZIP", "application/zip")
 
 # ── ABOUT ─────────────────────────────────────────────────────────────
-with tab6:
+with tab5:
     st.subheader("About AgroInsight Kenya")
     st.markdown("""
     **AgroInsight Kenya** applies machine learning to predict crop yields for Kenyan smallholder farmers.

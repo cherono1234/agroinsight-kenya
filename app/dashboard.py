@@ -94,9 +94,9 @@ st.title("AgroInsight Kenya")
 st.caption("A Machine Learning System for Crop Yield Prediction | Kenya")
 st.divider()
 
-tab0, tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Home", "Prediction", "Farm Advisory",
-    "Data Explorer", "Trends", "Downloads", "About"
+    "Data Explorer", "Trends", "About"
 ])
 
 # ── HOME ─────────────────────────────────────────────────────────────
@@ -372,37 +372,6 @@ with tab4:
         ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f"{x:,.0f}"))
         ax.set_facecolor("#FAFAFA"); fig.patch.set_facecolor("white")
         fig.tight_layout(); st.pyplot(fig); plt.close()
-
-# ── DOWNLOADS ──────────────────────────────────────────────────────────
-with tab5:
-    st.subheader("Download Reports")
-    st.caption("Download the full project and system reports as PDF or LaTeX source.")
-    import os, base64
-    def make_btn(filepath, label, mime):
-        if os.path.exists(filepath):
-            with open(filepath, "rb") as f:
-                data = f.read()
-            b64 = base64.b64encode(data).decode()
-            size_kb = len(data) // 1024
-            href = f'<a href="data:{mime};base64,{b64}" download="{os.path.basename(filepath)}" style="display:inline-block;padding:10px 20px;background:#1A6B3A;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;margin:4px 8px 4px 0">{label} ({size_kb} KB)</a>'
-            st.markdown(href, unsafe_allow_html=True)
-        else:
-            st.warning(f"File not found: {filepath}")
-    BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DOCS = os.path.join(BASE, "docs")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### Project Report")
-        st.markdown("**24 pages** — Chapters 1 to 4, UML diagrams, test results, conclusion")
-        make_btn(os.path.join(DOCS, "AgroInsight_Kenya_Project_Report.pdf"), "Download PDF", "application/pdf")
-    with col2:
-        st.markdown("### System Report")
-        st.markdown("**25 pages** — Architecture, module docs, user manual, API reference")
-        make_btn(os.path.join(DOCS, "AgroInsight_Kenya_System_Report.pdf"), "Download PDF", "application/pdf")
-    st.divider()
-    st.markdown("### LaTeX Source")
-    st.markdown("Full LaTeX source + figures for both reports.")
-    make_btn(os.path.join(DOCS, "AgroInsight_Kenya_Both_LaTeX.zip"), "Download LaTeX ZIP", "application/zip")
 
 # ── ABOUT ─────────────────────────────────────────────────────────────
 with tab5:

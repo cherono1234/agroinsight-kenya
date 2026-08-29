@@ -53,6 +53,121 @@ df = load_clean_data()
 
 RATING_COLORS = {"Excellent":"#0B3E85","Good":"#4CAF50","Fair":"#FF9800","Poor":"#F44336"}
 
+def generate_prediction_pdf(result, county, crop, season, year, rainfall, temperature, ph_level, fertility, area):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                            rightMargin=2*cm, leftMargin=2*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    GREEN = colors.HexColor("#1A6B3A")
+    LIGHT = colors.HexColor("#E8F5E9")
+
+    title_style   = ParagraphStyle("title",   parent=styles["Title"],   textColor=GREEN, fontSize=20, spaceAfter=6)
+    heading_style = ParagraphStyle("heading", parent=styles["Heading2"], textColor=GREEN, fontSize=13, spaceAfter=4)
+    normal_style  = ParagraphStyle("normal",  parent=styles["Normal"],  fontSize=10,    spaceAfter=4)
+    small_style   = ParagraphStyle("small",   parent=styles["Normal"],  fontSize=9,     textColor=colors.grey)
+
+    story = []
+
+    # Header
+    story.append(Paragraph("AgroInsight Kenya", title_style))
+    story.append(Paragraph("Crop Yield Prediction Report", heading_style))
+    story.append(Paragraph(f"Generated: {__import__('datetime').datetime.now().strftime('%B %d, %Y at %H:%M')}", small_style))
+    story.append(Spacer(1, 0.4*cm))
+
+    # Divider line
+    story.append(Table([[""]], colWidths=[17*cm],
+        style=TableStyle([("LINEBELOW", (0,0), (-1,-1), 1.5, GREEN)])))
+    story.append(Spacer(1, 0.4*cm))
+
+    # Prediction result box
+    story.append(Paragraph("Prediction Result", heading_style))
+    result_data = [
+        ["County", county,           "Crop",        crop],
+        ["Season", season,           "Year",        str(year)],
+        ["Yield per Hectare", f"{result['predicted_yield']:,} kg/ha", "Rating", result["rating"]],
+        [f"Total Yield ({area} ha)", f"{round(result['predicted_yield']*area, 2):,} kg", "Model R²", str(result["model_r2"])],
+    ]
+    result_table = Table(result_data, colWidths=[4*cm, 4.5*cm, 4*cm, 4.5*cm])
+    result_table.setStyle(TableStyle([
+        ("BACKGROUND",  (0,0), (0,-1), LIGHT),
+        ("BACKGROUND",  (2,0), (2,-1), LIGHT),
+        ("FONTNAME",    (0,0), (0,-1), "Helvetica-Bold"),
+        ("FONTNAME",    (2,0), (2,-1), "Helvetica-Bold"),
+        ("TEXTCOLOR",   (0,0), (0,-1), GREEN),
+        ("TEXTCOLOR",   (2,0), (2,-1), GREEN),
+        ("FONTSIZE",    (0,0), (-1,-1), 10),
+        ("GRID",        (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ("ROWBACKGROUNDS", (0,0), (-1,-1), [colors.white, colors.HexColor("#F9FFF9")]),
+        ("PADDING",     (0,0), (-1,-1), 8),
+    ]))
+    story.append(result_table)
+    story.append(Spacer(1, 0.4*cm))
+
+    # Recommendation
+    story.append(Paragraph("Recommendation", heading_style))
+    story.append(Paragraph(result["recommendation"], normal_style))
+    story.append(Spacer(1, 0.4*cm))
+
+    # Input parameters
+    story.append(Paragraph("Input Parameters Used", heading_style))
+    input_data = [
+        ["Parameter", "Value"],
+        ["Average Rainfall",    f"{rainfall} mm"],
+        ["Average Temperature", f"{temperature} °C"],
+        ["Soil pH Level",       str(ph_level)],
+        ["Soil Fertility Index",str(fertility)],
+        ["Area Planted",        f"{area} ha"],
+    ]
+    input_table = Table(input_data, colWidths=[8.5*cm, 8.5*cm])
+    input_table.setStyle(TableStyle([
+        ("BACKGROUND",     (0,0), (-1,0),  GREEN),
+        ("TEXTCOLOR",      (0,0), (-1,0),  colors.white),
+        ("FONTNAME",       (0,0), (-1,0),  "Helvetica-Bold"),
+        ("FONTSIZE",       (0,0), (-1,-1), 10),
+        ("GRID",           (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.white, LIGHT]),
+        ("PADDING",        (0,0), (-1,-1), 8),
+    ]))
+    story.append(input_table)
+    story.append(Spacer(1, 0.4*cm))
+
+    # Model info
+    story.append(Paragraph("Model Information", heading_style))
+    model_data = [
+        ["Parameter", "Value"],
+        ["ML Algorithm",  result.get("model_name", "XGBoost")],
+        ["R² Score",      str(result["model_r2"])],
+        ["RMSE",          f"{result.get('model_rmse', 126.47)} kg/ha"],
+        ["Training Data", "4,700 records · 47 counties · 10 years"],
+        ["Data Sources",  "KNBS, NASA POWER, FAO GAEZ"],
+    ]
+    model_table = Table(model_data, colWidths=[8.5*cm, 8.5*cm])
+    model_table.setStyle(TableStyle([
+        ("BACKGROUND",     (0,0), (-1,0),  GREEN),
+        ("TEXTCOLOR",      (0,0), (-1,0),  colors.white),
+        ("FONTNAME",       (0,0), (-1,0),  "Helvetica-Bold"),
+        ("FONTSIZE",       (0,0), (-1,-1), 10),
+        ("GRID",           (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.white, LIGHT]),
+        ("PADDING",        (0,0), (-1,-1), 8),
+    ]))
+    story.append(model_table)
+    story.append(Spacer(1, 0.5*cm))
+
+    # Footer
+    story.append(Table([[""]], colWidths=[17*cm],
+        style=TableStyle([("LINEABOVE", (0,0), (-1,-1), 1, GREEN)])))
+    story.append(Paragraph(
+        "AgroInsight Kenya · agroinsight-kenya.streamlit.app · St. Paul's University Nairobi · 2026",
+        ParagraphStyle("footer", parent=styles["Normal"], fontSize=8, textColor=colors.grey, alignment=1)
+    ))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+
 # ── SIDEBAR ──────────────────────────────────────────────────────────
 with st.sidebar:
     st.title("AgroInsight Kenya")
